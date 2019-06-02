@@ -1,10 +1,8 @@
 # SITE CONFIGURATION
 title: Coded Chai # your site title
-author: Connor Hasting # You :P
+author: Connor Hasting # You
 description: > # Meta description of Homepage
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Connor Hasting's Personal Website
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://codedchai.com/" # the base hostname & protocol for your site, e.g. http://example.com
 
@@ -18,10 +16,9 @@ social:
 navigation: # Navigation links
   - {name: 'Home', link: '/'}
   - {name: 'About', link: '/about'}
-  - {name: 'Projects', link: '/projects'}
 
 tagline: >
-  Modern Jekyll theme focused on speed performance &amp; SEO best practices
+  Connor Hasting's Personal Website
 
 hero_img: posts/sleek_lg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
 
