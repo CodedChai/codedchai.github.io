@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Creating a Collage of Music Listening Habits"
+title: "Visualizing Music Listening Habits"
 summary: "Creating a collage of album artworks from the music you have been listening to"
 featured-img: lastcollageexample
 ---
