@@ -1,7 +1,8 @@
 ---
 layout: post
-title: "Understanding What CHIP-8 is"
+title: "Tackling a CHIP-8 Interpreter, Part 0"
 summary: "Going through a basic outline of what the CHIP-8 specification is and what my future posts will be covering."
+featured-img: chip8
 ---
 
 # What is CHIP-8?
