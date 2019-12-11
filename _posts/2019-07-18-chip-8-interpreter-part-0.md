@@ -15,7 +15,7 @@ I mostly used the Wikipedia page to gather the information on this for reference
 
 ## Memory
 
-We will have 4096 bytes of memory available to us. This sounds like a true 4k system to me! Since this is a modern implementation of CHIP-8 we will only need to reserve memory for the video out data and the call stack. This means we will reserve the highest 256 bytes (0xF00-0xFFFF) for our display information and the 96 bytes below that to the call stack information. 
+We will have 4096 bytes of memory available to us. This sounds like a true 4k system to me! Since this is a modern implementation of CHIP-8 we will only need to reserve memory for the video out data and the call stack. This means we will reserve the highest 256 bytes (0xF000-0xFFFF) for our display information and the 96 bytes below that to the call stack information. 
 
 ## Registers
 
