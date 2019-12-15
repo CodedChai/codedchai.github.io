@@ -11,7 +11,39 @@ ROMs consist solely of byte data. This means they won't open in all text viewing
 
 # Disassembler Design
 
-From my understanding Chip-8 is designed to load in the entire ROM into memory which is what we will be doing. We will need to read in the file's bytes and then we will need to format the bytes into hexadecimal. We will then create the opcode which comprises of two bytes and we will store have that stored into our memory. We'll start with something like below to ensure we read the bytes in. Since we are only reading in 2 bytes that is a short. We will also ensure that the byte buffer is in the Big Endian notation as specified by Chip-8.
+This should be a rather simple and easy process. We will want to load in all of the bytes, ensure that there isn't more than 3584 bytes and then return those bytes. We must ensure that the ROM is limited to 3584 in order to have a faithful redesign of a Chip-8 interpreter. So the code should be pretty straightforward, I have listed it below.
+
+<code>
+
+    public List<Byte> loadROM(Path filePath) throws Exception{
+		List<Byte> bytes = new ArrayList<>();
+
+		ByteBuffer byteBuffer = ByteBuffer.wrap( Files.readAllBytes( filePath ) );
+		byteBuffer.order( ByteOrder.BIG_ENDIAN);
+
+			while(byteBuffer.hasRemaining()){
+			Byte currentByte = byteBuffer.get();
+			bytes.add( currentByte );
+
+			System.out.println( String.format("%02X",( currentByte & 0xFF)) );
+		}
+
+		if(bytes.size() > MAXIMUM_ROM_SIZE){
+    		throw new Exception( "ROM '" + filePath.getFileName() + "' is too large to fit into Chip-8 RAM. It is " + bytes.size() + " bytes when the limit is " + MAXIMUM_ROM_SIZE );
+    	}
+
+    	return bytes;
+    }
+
+</code>
+
+# My Incorrect Approach
+
+### Feel free to skip this portion unless you want to learn a bit more about parsing bytes to Strings.
+
+From my initial understanding Chip-8 is designed to load in the entire ROM into memory as if they were all opcodes which is what I had initially done. If for any reason you are interested in checking out how that would go please feel free to keep on reading. It may serve as a good laugh anyway.
+
+We will need to read in the file's bytes and then we will need to format the bytes into hexadecimal. We will then create the opcode which comprises of two bytes and we will store have that stored into our memory. We'll start with something like below to ensure we read the bytes in. Since we are only reading in 2 bytes that is a short. We will also ensure that the byte buffer is in the Big Endian notation as specified by Chip-8.
 
 <code>
 
@@ -85,7 +117,7 @@ Now that we can store the Opcode we will want to loop through 2 bytes at a time 
 </code>
 
 
-This concludes the basics of how to read to ROMs into memory and for later use. 
+## This concludes the basics of how to read to ROMs for later use. 
 
 ### Next Up we will cover the design of the Opcode class.
 
