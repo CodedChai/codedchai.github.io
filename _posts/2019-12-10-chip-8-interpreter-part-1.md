@@ -25,7 +25,7 @@ From my understanding Chip-8 is designed to load in the entire ROM into memory w
 		System.out.println( v );
 	}
 
-<code>
+</code>
 
 
 Well if we look at the output we're getting all sorts of numbers, ranging from negative to positive. While byte wise this is expected we're going to translate this to be human readable to make more sense for us once we begin implementing opcodes. So we will want to convert our short to hexadecimal. With a [quick Google search](https://stackoverflow.com/questions/13356984/short-tohexstring) we can find out how to convert shorts to hexadecimal in Java. We haven't covered opcodes yet but they will be 2 bytes represented as String in our interpreter. This will make it rather easy going forward. We will not be using Integer.toHexString because it [trims leading zeroes](https://rules.sonarsource.com/java/RSPEC-4425). Instead we are going to grab each two bytes, build an Opcode object and then keep going until we run out of bytes.
@@ -53,7 +53,7 @@ For now we're going to keep our Opcode class simple and basically just have it h
 	}
 
 
-<code>
+</code>
 
 Now that we can store the Opcode we will want to loop through 2 bytes at a time and save our Opcodes for later.
 
@@ -82,7 +82,7 @@ Now that we can store the Opcode we will want to loop through 2 bytes at a time 
         return opcodes;
     }
 
-<code>
+</code>
 
 
 This concludes the basics of how to read to ROMs into memory and for later use. 
