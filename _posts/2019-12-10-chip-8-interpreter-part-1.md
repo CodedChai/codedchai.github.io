@@ -29,17 +29,18 @@ This should be a rather simple and easy process. We will want to load in all of 
 		}
 
 		if(bytes.size() > MAXIMUM_ROM_SIZE){
-    		throw new Exception( "ROM '" + filePath.getFileName() + "' is too large to fit into Chip-8 RAM. It is " + bytes.size() + " bytes when the limit is " + MAXIMUM_ROM_SIZE );
+    		throw new Exception( "ROM '" + filePath.getFileName() + "' 
+    			is too large to fit into Chip-8 RAM. It is " + 
+    			bytes.size() + " bytes when the limit is " + MAXIMUM_ROM_SIZE );
     	}
 
     	return bytes;
     }
 
-</code>
 
 # My Incorrect Approach
 
-### Feel free to skip this portion unless you want to learn a bit more about parsing bytes to Strings.
+### Read this section if you want to learn a bit more about parsing bytes to Strings.
 
 From my initial understanding Chip-8 is designed to load in the entire ROM into memory as if they were all opcodes which is what I had initially done. If for any reason you are interested in checking out how that would go please feel free to keep on reading. It may serve as a good laugh anyway.
 
@@ -57,7 +58,6 @@ We will need to read in the file's bytes and then we will need to format the byt
 		System.out.println( v );
 	}
 
-</code>
 
 
 Well if we look at the output we're getting all sorts of numbers, ranging from negative to positive. While byte wise this is expected we're going to translate this to be human readable to make more sense for us once we begin implementing opcodes. So we will want to convert our short to hexadecimal. With a [quick Google search](https://stackoverflow.com/questions/13356984/short-tohexstring) we can find out how to convert shorts to hexadecimal in Java. We haven't covered opcodes yet but they will be 2 bytes represented as String in our interpreter. This will make it rather easy going forward. We will not be using Integer.toHexString because it [trims leading zeroes](https://rules.sonarsource.com/java/RSPEC-4425). Instead we are going to grab each two bytes, build an Opcode object and then keep going until we run out of bytes.
@@ -84,8 +84,6 @@ For now we're going to keep our Opcode class simple and basically just have it h
 
 	}
 
-
-</code>
 
 Now that we can store the Opcode we will want to loop through 2 bytes at a time and save our Opcodes for later.
 
@@ -114,7 +112,6 @@ Now that we can store the Opcode we will want to loop through 2 bytes at a time 
         return opcodes;
     }
 
-</code>
 
 
 ## This concludes the basics of how to read to ROMs for later use. 
