@@ -7,7 +7,7 @@ featured-img: trinkettemps
 
 # Approach
 
-I used Arduino C and Java with the jSerialComm library and the JSensors library. I have a Java application that will look for any USB Serial devices and then attempt to open a connection with them. From there it will send the temperatures of the CPU and the GPU to the Arduino. The Arduino will then read in the received data, parse it out and then have it displayed on the OLED screen. I have the process run at 5hz to ensure that it doesn't cause any hiccups in performence on the PC side when playing high intensity games or running high intensity tasks, such as Houdini. 
+I used Arduino C and Java with the [jSerialComm library](https://github.com/Fazecast/jSerialComm) and the [JSensors library](https://github.com/profesorfalken/jSensors). I have a Java application that will look for any USB Serial devices and then attempt to open a connection with them. From there it will send the temperatures of the CPU and the GPU to the Arduino. The Arduino will then read in the received data, parse it out and then have it displayed on the OLED screen. I have the process run at 5hz to ensure that it doesn't cause any hiccups in performence on the PC side when playing high intensity games or running high intensity tasks, such as Houdini. 
 
 # Pitfalls & Challenges
 
@@ -27,7 +27,7 @@ Go ahead and clone my [repository](https://github.com/CodedChai/TrinketM0Display
 * [Small Breadboard](https://www.amazon.com/Qunqi-point-Experiment-Breadboard-5-5%C3%978-2%C3%970-85cm/dp/B0135IQ0ZC/ref=sr_1_4?keywords=small+breadboard&qid=1575236114&s=electronics&sr=1-4)
 * Some random wires
 
-# Images
+# The Fruits of My Labor
 
 ## Awaiting Connection
 
