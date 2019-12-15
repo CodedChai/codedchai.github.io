@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Displaying PC Temperatures on an OLED Using an Arduino"
+title: "Displaying PC Temperatures Using an Arduino"
 summary: "Using serial communication with an Arduino to display PC temperatures"
 featured-img: trinkettemps
 ---
