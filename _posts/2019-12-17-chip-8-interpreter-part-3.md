@@ -21,7 +21,7 @@ Since we will be making this it's own thread we will be implementing runnable wh
 
 Chip-8 is forgiving in that it doesn't have a set frequency that we are required to emulate at. This means we don't have to worry about a ton of annoying timing stuff. As a note I will be using the Java Duration and Instant features to make my life easier and ensure better accuracy so make sure you're on Java 9 or later. 
 
-If you followed my hint link in the last post you would see it took you here: https://github.com/AfBu/haxe-chip-8-emulator/wiki/(Super)CHIP-8-Secrets. See, we will want to ensure that we properly hit the set frequency. In order to do this we will be running all of our operations in set batches. We will calculate how many opcodes to run by using the delta time (in seconds) multiplied by the frequency. If you have ever done game programming you would recognize delta time as that is the common name used for the time between frames. Except instead of computing the time between frames we will be computing the time since we last ran calculations. 
+If you followed my hint link in the last post you would see it took you here: <https://github.com/AfBu/haxe-chip-8-emulator/wiki/(Super)CHIP-8-Secrets>. See, we will want to ensure that we properly hit the set frequency. In order to do this we will be running all of our operations in set batches. We will calculate how many opcodes to run by using the delta time (in seconds) multiplied by the frequency. If you have ever done game programming you would recognize delta time as that is the common name used for the time between frames. Except instead of computing the time between frames we will be computing the time since we last ran calculations. 
 
 This will give us:
 
