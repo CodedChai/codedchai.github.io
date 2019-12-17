@@ -20,4 +20,4 @@ So this should be pretty self explanatory, I don't expect to do anything too cra
 
 Wait a second... where's the main loop then? Since Render is only called on render is that what we are going to use to emulate each cycle? Wouldn't a variable framerate change this?
 
-What a fantastic observation!! We will be getting around to that next time. Here's a [hint](https://github.com/AfBu/haxe-CHIP-8-emulator/wiki) though. We'll be looking to achieve a 500 Hz CPU speed.
+What a fantastic observation!! We will be getting around to that next time. Here's a [hint](https://github.com/AfBu/haxe-CHIP-8-emulator/wiki) though. We'll be looking to achieve a blazing fast 500 Hz CPU speed.
