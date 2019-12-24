@@ -19,6 +19,18 @@ All opcodes are 2 bytes long and are stored big endian. Something to note is tha
 
 # WARNING! FUN TIMES AHEAD!
 
+## How do we get our opcode?
+
+Remember, an opcode is 2 bytes of data that (should, we won't add any validation) start at an even numbered memory location. So to get our opcode we will use this code:
+
+<code>
+
+    opcode = (short) (memory[programCounter] << 8 | memory[programCounter + 1]);
+
+We will be grabbing the first byte at the first memory location, bit shifting it left 8 bits and then filling in the final 8 bits with the second byte which is at the memory location right after the program counter.
+
+## How should I interpret the next part?
+
 Here are all of the opcodes in Java Code form. They include comments that describe what they do along with their standard instruction name. The comments will be laid out like :
 
 > Opcode Value - Opcode Name
@@ -28,15 +40,56 @@ You'll notice that most of these opcodes end with *programCounter += 2;*. This i
 
 <code>
 
-    /*
-    00E0 - Clear Screen
-    Reset all pixels to 0, set drawFlag to true so we know that pixels were updated
-    */
-    private void cls() {
-        for ( int i = 0; i < pixels.length; i++ ) {
-            pixels[i] = 0;
-        }
-        drawFlag = true;
-        programCounter += 2;
-    }
+    	/*
+	00E0 - Clear Screen
+	Reset all pixels to 0, set drawFlag to true so we know that pixels were updated
+	 */
+	private void cls() {
+		for ( int i = 0; i < pixels.length; i++ ) {
+			pixels[i] = 0;
+		}
+		drawFlag = true;
+		programCounter += 2;
+	}
+
+	/*
+	00EE - Return from a subroutine
+	We will set the program counter to the address at the top of the stack, then subtract 1 from the stack pointer
+	 */
+	private void ret() {
+		programCounter = callStack[stackPointer];
+		stackPointer--;
+	}
+
+	/*
+	1nnn - Jump to address
+	We will set the program counter to address nnn, we will do this by masking the first bit in the opcode
+	 */
+	private void jmp() {
+		programCounter = (short) (opcode & 0x0FFF);
+	}
+
+	/*
+	2nnn - Call address
+	We will call the subroutine at address nnn. We will increment the stack pointer, put the current program counter on
+	the top of the stack, and then set the program counter to nnn
+	 */
+	private void call() {
+		stackPointer++;
+		callStack[stackPointer] = programCounter;
+		programCounter = (short) (opcode & 0x0FFF);
+	}
+
+	/*
+	3xkk - SE
+	We will skip the next opcode if Vx is equal to kk. If Vx == kk then increment the program counter by 4 (to skip the next
+	opcode) otherwise we will increment the program counter by 2
+	 */
+	private void SE() {
+		if ( vRegisters[(opcode & 0x0F00) >> 8] == (opcode & 0x0FF) ) {
+			programCounter += 4;
+		} else {
+			programCounter += 2;
+		}
+	}
 
