@@ -12,10 +12,10 @@ Okay so there are 35 opcodes for Chip-8. You may be asking, what the hell is an 
 All opcodes are 2 bytes long and are stored big endian. Something to note is that in memory each first byte of each instruction should be stored in an even address. I will be using the same verbiage as [other Chip-8 tutorials](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM) to help describe the opcodes. The verbiage is below:
 
 *nnn or addr* - 12 bit value, specifically the lower 12 bits of the opcode.
-*n or nibble* - 4 bit value, specifically the lowest 4 bits of the opcode.
+*kk* - 8 bit value, specifically the lowest 8 bits of the opcode.
 *x* - 4 bit value, specifically the lower 4 bits of the high byte of the opcode. That means the lower 4 bits of the first byte.
 *y* - 4 bit value, specifically the upper 4 bits of the low byte of the opcode. That means the higher 4 bits of the second byte.
-*kk or byte* - 8 bit value, specifically the lowest 8 bits of the opcode.
+*n* - 4 bit value, specifically the lowest 4 bits of the opcode.
 
 To make this even easier I used the following methods to get these values.
 
@@ -35,6 +35,10 @@ To make this even easier I used the following methods to get these values.
 
 	byte getY() {
 		return (byte) ((opcode & 0x00F0) >> 4);
+	}
+
+    byte getN() {
+		return (byte) (opcode & 0x00F);
 	}
 
 
@@ -259,5 +263,140 @@ You'll notice that most of these opcodes end with *programCounter += 2;*. This i
 		vRegisters[getX()] <<= 1;
 		programCounter += 2;
 	}
-	
+
+	/*
+	9xy0 - SNE Vx, Vy
+	We will skip the next opcode if Vx is not equal to Vy. If Vx != Vy then increment the program counter by 4 (to skip the next
+	opcode) otherwise we will increment the program counter by 2.
+	 */
+	private void SNEVxIsNotVy() {
+		if ( vRegisters[getX()] != vRegisters[getY()] ) {
+			programCounter += 4;
+		} else {
+			programCounter += 2;
+		}
+	}
+
+	/*
+	Annn - LD I, nnn
+	Set register I to nnn
+	 */
+	private void loadINNN() {
+		indexRegister = getNNN();
+		programCounter += 2;
+	}
+
+	/*
+	Bnnn - JP V0, nnn
+	The program counter is set to nnn + V0
+	 */
+	private void jumpNNNV0() {
+		programCounter = (short) (getNNN() + vRegisters[0]);
+	}
+
+	/*
+	Cxkk - RND Vx, kk
+	We will generate a random number between 0 and 255. We will then bitwise AND that random number with Vx and store that in Vx.
+	 */
+	private void randomVxKK() {
+		vRegisters[getX()] = (byte) (random.nextInt( 256 ) & vRegisters[getX()]);
+		programCounter += 2;
+	}
+
+	/*
+	Dxyn - DRW Vx, Vy, nibble
+	Display n-byte sprite starting at memory location I and screen coordinate (Vx, Vy), set VF if there is a collision.
+	We will read in n bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on the screen
+	at location (Vx, Vy). Sprites are XORed onto the existing screen. If this causes any pixels to disappear, VF is set to 1, otherwise
+	it is set to 0. If the sprite is positioned so that some of it is outside of the display it wraps around to the other side of the screen.
+
+	Remember that sprites are always 8 pixels wide
+	 */
+	private void displayVxVyN() {
+		int x = getX();
+		int y = getY();
+		int spriteHeight = getN();
+		int pixelValue;
+
+		for ( int yLine = 0; yLine < spriteHeight; yLine++ ) {
+			pixelValue = memory[indexRegister + yLine];
+			for ( int xLine = 0; xLine < 8; xLine++ ) {
+				if ( (pixelValue & (0x80 >> xLine)) != 0 ) {
+					if ( pixels[x + xLine + ((y + yLine) * 64)] == 1 ) {
+						vRegisters[0x0F] = 1;
+					} else {
+						vRegisters[0x0F] = 0;
+					}
+					pixels[x + xLine + ((y + yLine) * 64)] ^= 1;
+				}
+			}
+		}
+
+		drawFlag = true;
+		programCounter += 2;
+	}
+
+	/*
+	Ex9E - SKP Vx
+	Skip the next opcode if the key with the value of Vx is currently pressed.
+	 */
+	private void skipKeyPressed() {
+		if ( keys[vRegisters[getX()]] != 0 ) {
+			programCounter += 4;
+		} else {
+			programCounter += 2;
+		}
+	}
+
+	/*
+	ExA1 - SKNP Vx
+	Skip the next opcode if the key with the value of Vx is currently NOT pressed.
+	 */
+	private void skipKeyReleased() {
+		if ( keys[vRegisters[getX()]] == 0 ) {
+			programCounter += 4;
+		} else {
+			programCounter += 2;
+		}
+	}
+
+	/*
+	Fx07 - LD Vx, Delay Timer
+	The value of the delay timer is put into Vx
+	 */
+	private void loadVxDisplayTimer() {
+		vRegisters[getX()] = (byte) delayTimer;
+		programCounter += 2;
+	}
+
+	/*
+	Fx0A - LD Vx, Key
+	All execution STOPS until a key is pressed. Store the value of the key in Vx and then continue processing like normal.
+	 */
+	private void loadKeyPress() {
+		for ( int i = 0; i < keys.length; i++ ) {
+			if ( keys[i] != 0 ) {
+				vRegisters[getX()] = keys[i];
+				programCounter += 2;
+			}
+		}
+	}
+
+	/*
+	Fx15 - LD Delay Timer, Vx
+	Delay timer is set to the value of Vx
+	 */
+	private void loadDelayTimer() {
+		delayTimer = vRegisters[getX()];
+		programCounter += 2;
+	}
+
+	/*
+	Fx18 - LD Sound Timer, Vx
+	Sound timer is set to the value of Vx
+	 */
+	private void loadSoundTimer() {
+		soundTimer = vRegisters[getX()];
+		programCounter += 2;
+	}
 
