@@ -400,3 +400,59 @@ You'll notice that most of these opcodes end with *programCounter += 2;*. This i
 		programCounter += 2;
 	}
 
+	/*
+	Fx1E - Add I, Vx
+	Add the values of I and Vx, store the results in I
+	 */
+	private void addIVx() {
+		// TODO: Figure out if I need to set carry flag
+		indexRegister += vRegisters[getX()];
+		programCounter += 2;
+	}
+
+	/*
+	Fx29 - LD F, Vx
+	The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx.
+	 */
+	private void setFontLocationInI() {
+		indexRegister = (short) (vRegisters[getX()] * 5); // Multiply by 5 since we have 5 values for each font
+		programCounter += 2;
+	}
+
+	/*
+	Fx33 - LD B, Vx
+	Store binary coded decimal  of Vx at address I, I + 1 and I + 2. I gets the hundreds digit, I + 1 gets the tens digit and I + 2 gets the ones digit.
+	 */
+	private void setBCD() {
+		memory[indexRegister] = (byte) (vRegisters[getX()] / 100);
+		memory[indexRegister + 1] = (byte) ((vRegisters[getX()] / 10) % 10);
+		memory[indexRegister + 2] = (byte) ((vRegisters[getX()] % 100) % 10);
+		programCounter += 2;
+	}
+
+	/*
+	Fx55 - LD I, Vx
+	Store registers V0 through Vx in memory starting at location I
+	 */
+	private void storeRegisters() {
+		for ( int registerIndex = 0; registerIndex <= getX(); registerIndex++ ) {
+			memory[indexRegister + registerIndex] = vRegisters[registerIndex];
+		}
+		programCounter += 2;
+	}
+
+	/*
+	Fx65 - LD Vx, I
+	Read the memory values starting at I and load them into registers V0 through Vx
+	 */
+	private void loadRegisters() {
+		for ( int registerIndex = 0; registerIndex <= getX(); registerIndex++ ) {
+			vRegisters[registerIndex] = memory[indexRegister + registerIndex];
+		}
+		programCounter += 2;
+	}
+
+
+# Holy Opcodes, Batman!!
+
+Right?! It's a lot even for such a simple machine. On our next episode we'll be covering something that I briefly mentioned in the opcode setFontLocationInI() which is the font set. I will also be covering how we are going to be selecting our opcodes. As a hint it may have something to do with Nintendo's latest hit console...
