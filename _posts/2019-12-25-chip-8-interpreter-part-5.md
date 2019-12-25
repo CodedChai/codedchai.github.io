@@ -17,6 +17,28 @@ All opcodes are 2 bytes long and are stored big endian. Something to note is tha
 *y* - 4 bit value, specifically the upper 4 bits of the low byte of the opcode. That means the higher 4 bits of the second byte.
 *kk or byte* - 8 bit value, specifically the lowest 8 bits of the opcode.
 
+To make this even easier I used the following methods to get these values.
+
+<code>
+
+    short getNNN() {
+		return (short) (opcode & 0x0FFF);
+	}
+
+	byte getKK() {
+		return (byte) (opcode & 0x00FF);
+	}
+
+	byte getX() {
+		return (byte) ((opcode & 0x0F00) >> 8);
+	}
+
+	byte getY() {
+		return (byte) ((opcode & 0x00F0) >> 4);
+	}
+
+
+
 # WARNING! FUN TIMES AHEAD!
 
 ## How do we get our opcode?
@@ -40,7 +62,7 @@ You'll notice that most of these opcodes end with *programCounter += 2;*. This i
 
 <code>
 
-    	/*
+	/*
 	00E0 - Clear Screen
 	Reset all pixels to 0, set drawFlag to true so we know that pixels were updated
 	 */
@@ -66,7 +88,7 @@ You'll notice that most of these opcodes end with *programCounter += 2;*. This i
 	We will set the program counter to address nnn, we will do this by masking the first bit in the opcode
 	 */
 	private void jmp() {
-		programCounter = (short) (opcode & 0x0FFF);
+		programCounter = getNNN();
 	}
 
 	/*
@@ -77,19 +99,165 @@ You'll notice that most of these opcodes end with *programCounter += 2;*. This i
 	private void call() {
 		stackPointer++;
 		callStack[stackPointer] = programCounter;
-		programCounter = (short) (opcode & 0x0FFF);
+		programCounter = getNNN();
 	}
 
 	/*
-	3xkk - SE
+	3xkk - SE Vx, kk
 	We will skip the next opcode if Vx is equal to kk. If Vx == kk then increment the program counter by 4 (to skip the next
 	opcode) otherwise we will increment the program counter by 2
 	 */
-	private void SE() {
-		if ( vRegisters[(opcode & 0x0F00) >> 8] == (opcode & 0x0FF) ) {
+	private void SEVxIsKK() {
+		if ( vRegisters[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF) ) {
 			programCounter += 4;
 		} else {
 			programCounter += 2;
 		}
 	}
+
+	/*
+	4xkk - SNE Vx, kk
+	We will skip the next opcode if Vx is not equal to kk. If Vx != kk then increment the program counter by 4 (to skip the next
+	opcode) otherwise we will increment the program counter by 2
+	 */
+	private void SNEVxIsNotKK() {
+		if ( vRegisters[getX()] != (getKK()) ) {
+			programCounter += 4;
+		} else {
+			programCounter += 2;
+		}
+	}
+
+	/*
+	5xy0 - SE vx, vy
+	We will skip the next opcode if Vx is equal to Vy. If Vx == Vy then increment the program counter by 4 (to skip the next
+	opcode) otherwise we will increment the program counter by 2
+	 */
+	private void SEVxIsVy() {
+		if ( vRegisters[getX()] == (vRegisters[getY()]) ) {
+			programCounter += 4;
+		} else {
+			programCounter += 2;
+		}
+	}
+
+	/*
+	6xkk - LD Vx, kk
+	Load the value kk into Vx
+	 */
+	private void loadKKToVx() {
+		vRegisters[getX()] = getKK();
+		programCounter += 2;
+	}
+
+	/*
+	7xkk - Add Vx, kk
+	Add kk to the value in Vx and store in Vx
+	 */
+	private void addVxKK() {
+		// TODO: Figure out if we need to set the carry
+		vRegisters[getX()] = (byte) (vRegisters[getX()] + getKK());
+		programCounter += 2;
+	}
+
+	/*
+	8xy0 - LD Vx, Vy
+	Load the value Vy into the Vx register
+	 */
+	private void loadVxVy() {
+		vRegisters[getX()] = vRegisters[getY()];
+		programCounter += 2;
+	}
+
+	/*
+	8xy1 - OR Vx, Vy
+	Set Vx to the bitwise OR of the values of Vx and Vy
+	 */
+	private void orVxVy() {
+		vRegisters[getX()] = (byte) (vRegisters[getX()] | vRegisters[getY()]);
+		programCounter += 2;
+	}
+
+	/*
+	8xy2 - AND Vx, Vy
+	Set Vx to the bitwise AND of the values of Vx and Vy
+	 */
+	private void andVxVy() {
+		vRegisters[getX()] = (byte) (vRegisters[getX()] & vRegisters[getY()]);
+		programCounter += 2;
+	}
+
+	/*
+	8xy3 - XOR Vx, Vy
+	Set Vx to the bitwise XOR of the values of Vx and Vy
+	 */
+	private void xorVxVy() {
+		vRegisters[getX()] = (byte) (vRegisters[getX()] ^ vRegisters[getY()]);
+		programCounter += 2;
+	}
+
+	/*
+	8xy4 - Add Vx, Vy
+	Add Vx and Vy together. If the value is greater than a byte (>255) VF is set to 1, otherwise VF is set to 0. The lowest 8 bits are kept and stored in Vx.
+	 */
+	private void addVxVy() {
+		int sum = vRegisters[getX()] + vRegisters[getY()];
+		if ( sum > 255 ) {
+			vRegisters[0x0F] = 1;
+			sum -= 255;
+		} else {
+			vRegisters[0x0F] = 0;
+		}
+		vRegisters[getX()] = (byte) (sum);
+		programCounter += 2;
+	}
+
+	/*
+	8xy5 - SUB Vx, Vy
+	If Vx > Vy then VF is set to 1, otherwise it is set to 0. Then Vy is subtracted from Vx and stored in Vx.
+	*/
+	private void subVxVy() {
+		if ( vRegisters[getX()] > vRegisters[getY()] ) {
+			vRegisters[0x0F] = 1;
+		} else {
+			vRegisters[0x0F] = 0;
+		}
+		vRegisters[getX()] = (byte) (vRegisters[getX()] - vRegisters[getY()]);
+		programCounter += 2;
+	}
+
+	/*
+	8xy6 - SHR Vx
+	If the least significant bit is 1 then set VF to 1, otherwise set VF to 0. Then Vx is shifted right once (divided by two).
+	*/
+	private void shiftRightVx() {
+		vRegisters[0xF] = (byte) (vRegisters[getX()] & 0x1); // Set based on LSB
+		vRegisters[getX()] >>= 1;
+		programCounter += 2;
+	}
+
+	/*
+	8xy7 - SUBN Vx, Vy
+	If Vy > Vx then set VF to 1, otherwise set to 0. Then Vx is subtracted from Vy and the results are stored in Vx.
+	 */
+	private void subnVxVy() {
+		if ( vRegisters[getY()] > vRegisters[getX()] ) {
+			vRegisters[0x0F] = 1;
+		} else {
+			vRegisters[0x0F] = 0;
+		}
+		vRegisters[getX()] = (byte) (vRegisters[getY()] - vRegisters[getX()]);
+		programCounter += 2;
+	}
+
+	/*
+	8xyE - SHL Vx
+	If the most significant bit of Vx is 1 then set VF to 1, otherwise set to 0. Then shift Vx left once (multiply by two).
+	 */
+	private void shiftLeftVx() {
+		vRegisters[0x0F] = (byte) (vRegisters[getX()] >> 7); // Set based on MSB
+		vRegisters[getX()] <<= 1;
+		programCounter += 2;
+	}
+	
 
