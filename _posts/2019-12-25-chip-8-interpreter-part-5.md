@@ -47,11 +47,12 @@ To make this even easier I used the following methods to get these values.
 
 ## How do we get our opcode?
 
-Remember, an opcode is 2 bytes of data that (should, we won't add any validation) start at an even numbered memory location. So to get our opcode we will use this code:
+Remember, an opcode is 2 bytes of data that (should, we won't add any validation) start at an even numbered memory location. So to get our opcode we will have to bit shift the first byte over by 8 bits and then bitwise or the second byte. We will also have to mask the bytes with hex values to ensure that we don't delete any data and cause issues.
 
 <code>
 
-    opcode = (short) (memory[programCounter] << 8 | memory[programCounter + 1]);
+	opcode = (((memory[programCounter] & 0xFFFF) << 8)) | (memory[programCounter + 1] & 0xFF);
+
 
 We will be grabbing the first byte at the first memory location, bit shifting it left 8 bits and then filling in the final 8 bits with the second byte which is at the memory location right after the program counter.
 
