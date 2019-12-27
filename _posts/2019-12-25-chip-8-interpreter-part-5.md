@@ -2,7 +2,7 @@
 layout: post
 title: "Tackling a CHIP-8 Interpreter, Part 5"
 summary: "Opcodes Opcodes and More Opcodes"
-featured-img: chip8init
+featured-img: chip8opcode
 ---
 
 # What is an Opcode?

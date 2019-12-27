@@ -2,6 +2,7 @@
 layout: post
 title: "Tackling a CHIP-8 Interpreter, Part 2"
 summary: "Setting Up our Display Window"
+featured-img: chip8libgdx
 ---
 
 # Not Quite Rendering Just Yet...

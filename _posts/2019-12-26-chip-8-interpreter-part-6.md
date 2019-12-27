@@ -2,7 +2,7 @@
 layout: post
 title: "Tackling a CHIP-8 Interpreter, Part 6"
 summary: "How to execute code using our opcode"
-featured-img: chip8init
+featured-img: chip8switch
 ---
 
 # How are we going to use our opcode?
