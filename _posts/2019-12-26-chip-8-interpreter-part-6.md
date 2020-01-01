@@ -38,20 +38,36 @@ First we will mask the opcode so we only look at the first value. We can do this
 
 <code>
 
+	/*
+	This is each step of our processor, basically each tick
+	 */
+	private void emulateCycle() throws Exception {
+		opcode = (((memory[programCounter] & 0xFFFF) << 8) & 0xFFFF) | (memory[programCounter + 1] & 0xFF);
+		System.out.println( "Executing opcode: " + Integer.toHexString( opcode ) );
+		executeOpcode();
+	}
+
+	/*
+	Properly select and execute our opcode
+	 */
 	private void executeOpcode() throws Exception {
 
 		switch ( opcode & 0xF000 ) {
 			/* Begin case 0x0000 */
 			case 0x0000:
-				switch ( opcode & 0x000F ) {
+				switch ( opcode & 0x00FF ) {
 					case 0x0000:
+						programCounter += 2; // null operation, don't do anything
+						break;
+
+					case 0x00E0:
 						cls(); /* 00E0 */
 						break;
-					case 0x000E:
+					case 0x00EE:
 						ret(); /* 00EE */
 						break;
 					default:
-						throw new Exception( "Unknown opcode: " + opcode + " in [0x0000]" );
+						throw new Exception( "Unknown opcode: " + Integer.toHexString( opcode ) + " in [0x0000]" );
 				}
 				break;
 			/* End case 0x0000 */
@@ -139,7 +155,7 @@ First we will mask the opcode so we only look at the first value. We can do this
 						break;
 
 					default:
-						throw new Exception( "Unknown opcode: " + opcode + " in [0x8000]" );
+						throw new Exception( "Unknown opcode: " + Integer.toHexString( opcode ) + " in [0x8000]" );
 				}
 				break;
 			/* End case 0x8000 */
@@ -185,9 +201,8 @@ First we will mask the opcode so we only look at the first value. We can do this
 						skipKeyReleased(); /* ExA1 */
 						break;
 					default:
-						throw new Exception( "Unknown opcode: " + opcode + " in [0xE000]" );
+						throw new Exception( "Unknown opcode: " + Integer.toHexString( opcode ) + " in [0xE000]" );
 				}
-				displayVxVyN(); /* Dxyn */
 				break;
 			/* End case 0xE000 */
 
@@ -231,12 +246,13 @@ First we will mask the opcode so we only look at the first value. We can do this
 						break;
 
 					default:
-						throw new Exception( "Unknown opcode: " + opcode + " in [0xF000]" );
+						throw new Exception( "Unknown opcode: " + Integer.toHexString( opcode ) + " in [0xF000]" );
 				}
-				/* End case 0xF000 */
+				break;
+			/* End case 0xF000 */
 
 			default:
-				throw new Exception( "Unknown opcode: " + opcode );
+				throw new Exception( "Unknown opcode: " + Integer.toHexString( opcode ) );
 		}
 
 	}
